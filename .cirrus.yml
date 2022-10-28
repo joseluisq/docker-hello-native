@@ -14,14 +14,14 @@ task:
   only_if: $CIRRUS_TAG == ''
   timeout_in: 120m
   env:
-      DOCKER_HOST: tcp://localhost:2375
+    DOCKER_HOST: tcp://localhost:2375
   matrix:
     - name: linux-amd64
       container:
         image: docker:latest
         kvm: true
         additional_containers:
-          - name: dockerdaemon
+          - name: dockerdaemona
             image: docker:dind
             cpu: 2
             memory: 8G
@@ -35,7 +35,7 @@ task:
         image: docker:latest
         kvm: true
         additional_containers:
-          - name: dockerdaemon
+          - name: dockerdaemonb
             image: docker:dind
             cpu: 2
             memory: 8G
