@@ -1,13 +1,14 @@
 task:
   only_if: $CIRRUS_TAG == ''
+  timeout_in: 120m
   matrix:
     - name: linux-amd64
-      docker_builder:
-        platform: linux
+      container:
         image: docker:latest
+        platform: linux
     - name: linux-arm64
-      arm_docker_builder:
-        platform: linux
+      arm_container:
         image: docker:latest
+        platform: linux
   setup_script:
     - docker version
