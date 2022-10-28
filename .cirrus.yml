@@ -1,19 +1,10 @@
-task:
+docker_builder:
   only_if: $CIRRUS_TAG == ''
+  timeout_in: 120m
   matrix:
     - name: linux-amd64
-      container:
-        image: family/docker-builder
-        platform: linux
-        cpu: 4
-        memory: 12G
-        # kvm: true
     - name: linux-arm64
-      arm_container:
-        image: family/docker-builder-arm64
-        platform: linux
-        cpu: 4
-        memory: 12G
-        # kvm: true
+      env:
+        CIRRUS_ARCH: arm64
   setup_script:
-    - docker version
+  - docker version
