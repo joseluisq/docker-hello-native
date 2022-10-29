@@ -24,7 +24,7 @@ task:
           - name: dockerdaemona
             image: docker:dind
             cpu: 2
-            memory: 8G
+            memory: 4G
             port: 2375
             env:
               DOCKER_DRIVER: overlay2
@@ -38,7 +38,7 @@ task:
           - name: dockerdaemonb
             image: docker:dind
             cpu: 2
-            memory: 8G
+            memory: 4G
             port: 2375
             env:
               DOCKER_DRIVER: overlay2
