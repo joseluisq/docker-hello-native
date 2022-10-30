@@ -20,5 +20,5 @@ task:
         cpu: 4
         memory: 4G
 
-  build_script: make build
-  run_script: make build
+  build_script: make docker-build
+  run_script: make docker-run

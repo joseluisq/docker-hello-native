@@ -30,3 +30,9 @@ docker-build:
 		-t $(REPOSITORY)/hello-native:$(TAG) \
 		-f Dockerfile .
 .PHONY: docker-build
+
+docker-run:
+	@docker run --rm \
+		-t $(REPOSITORY)/hello-native:$(TAG) \
+		hello-native
+.PHONY: docker-run
