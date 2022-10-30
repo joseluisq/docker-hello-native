@@ -1,55 +1,7 @@
-# amd64_docker_builder:
-#   only_if: $CIRRUS_TAG == ''
-#   setup_script:
-#     - docker version
-
-# arm64_docker_builder:
-#   only_if: $CIRRUS_TAG == ''
-#   env:
-#     CIRRUS_ARCH: arm64
-#   setup_script:
-#     - docker version
-
-# task:
-  # only_if: $CIRRUS_TAG == ''
-  # timeout_in: 120m
-  # env:
-  #   DOCKER_HOST: tcp://localhost:2375
-  # matrix:
-  #   - name: linux-amd64
-  #     container:
-  #       image: docker:latest
-  #       kvm: true
-  #       additional_containers:
-  #         - name: dockerdaemon
-  #           image: docker:dind
-  #           cpu: 2
-  #           memory: 4G
-  #           port: 2375
-  #           env:
-  #             DOCKER_DRIVER: overlay2
-  #             DOCKER_TLS_CERTDIR: ""
-
-  #   - name: linux-arm64
-  #     arm_container:
-  #       image: docker:latest
-  #       kvm: true
-  #       additional_containers:
-  #         - name: dockerdaemon
-  #           image: docker:dind
-  #           cpu: 2
-  #           memory: 4G
-  #           port: 2375
-  #           env:
-  #             DOCKER_DRIVER: overlay2
-  #             DOCKER_TLS_CERTDIR: ""
-
-  # sleep_script: sleep 60 # so docker starts
-  # script: docker run ubuntu echo hello
-
 task:
   only_if: $CIRRUS_TAG == ''
   timeout_in: 120m
+  alias: build-linux-image
   matrix:
     - name: linux-amd64
       compute_engine_instance:
@@ -68,4 +20,5 @@ task:
         cpu: 4
         memory: 4G
 
-  script: docker run --rm joseluisq/static-web-server:2-alpine sh -c 'uname -a && static-web-server -V'
+  build_script: make build
+  run_script: make build
