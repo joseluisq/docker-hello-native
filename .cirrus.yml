@@ -68,4 +68,4 @@ task:
         cpu: 4
         memory: 4G
 
-  script: docker run ubuntu echo hello
+  script: docker run --rm joseluisq/static-web-server:2-alpine sh -c 'uname -a && static-web-server -V'
