@@ -10,39 +10,62 @@
 #   setup_script:
 #     - docker version
 
+# task:
+  # only_if: $CIRRUS_TAG == ''
+  # timeout_in: 120m
+  # env:
+  #   DOCKER_HOST: tcp://localhost:2375
+  # matrix:
+  #   - name: linux-amd64
+  #     container:
+  #       image: docker:latest
+  #       kvm: true
+  #       additional_containers:
+  #         - name: dockerdaemon
+  #           image: docker:dind
+  #           cpu: 2
+  #           memory: 4G
+  #           port: 2375
+  #           env:
+  #             DOCKER_DRIVER: overlay2
+  #             DOCKER_TLS_CERTDIR: ""
+
+  #   - name: linux-arm64
+  #     arm_container:
+  #       image: docker:latest
+  #       kvm: true
+  #       additional_containers:
+  #         - name: dockerdaemon
+  #           image: docker:dind
+  #           cpu: 2
+  #           memory: 4G
+  #           port: 2375
+  #           env:
+  #             DOCKER_DRIVER: overlay2
+  #             DOCKER_TLS_CERTDIR: ""
+
+  # sleep_script: sleep 60 # so docker starts
+  # script: docker run ubuntu echo hello
+
 task:
   only_if: $CIRRUS_TAG == ''
   timeout_in: 120m
-  env:
-    DOCKER_HOST: tcp://localhost:2375
   matrix:
     - name: linux-amd64
-      container:
-        image: docker:latest
-        kvm: true
-        additional_containers:
-          - name: dockerdaemona
-            image: docker:dind
-            cpu: 2
-            memory: 4G
-            port: 2375
-            env:
-              DOCKER_DRIVER: overlay2
-              DOCKER_TLS_CERTDIR: ""
+      compute_engine_instance:
+        image_project: cirrus-images
+        image: family/docker-builder
+        platform: linux
+        cpu: 8
+        memory: 8G
 
     - name: linux-arm64
-      arm_container:
-        image: docker:latest
-        kvm: true
-        additional_containers:
-          - name: dockerdaemonb
-            image: docker:dind
-            cpu: 2
-            memory: 4G
-            port: 2375
-            env:
-              DOCKER_DRIVER: overlay2
-              DOCKER_TLS_CERTDIR: ""
+      compute_engine_instance:
+        image_project: cirrus-images
+        image: family/docker-builder-arm64
+        architecture: arm64
+        platform: linux
+        cpu: 4
+        memory: 4G
 
-  sleep_script: sleep 30 # so docker starts
   script: docker run ubuntu echo hello
