@@ -1,7 +1,6 @@
 task:
   only_if: $CIRRUS_TAG == ''
   timeout_in: 120m
-  alias: build-linux-image
   matrix:
     - name: linux-amd64
       compute_engine_instance:
@@ -22,3 +21,51 @@ task:
 
   build_script: make docker-build
   run_script: make docker-run
+
+task:
+  only_if: $CIRRUS_TAG != ''
+  alias: build-linux-image
+  timeout_in: 120m
+  env:
+    DOCKER_USERNAME: ENCRYPTED[05b15d72b49f71a1f7b5c3dd7fa91f640fe95b75265b822ea1a4fb520a2cc63b5c81c90ef68e347feef6c5ffd7c29e39]
+    DOCKER_PASSWORD: ENCRYPTED[173ed8d2377a22ff1315c37d6d2085638b3edbe2ddf1dc7a9de851b0f2d0a563c64bc27550a53ba2d45d458e4d565cba]
+  matrix:
+    - name: linux-amd64
+      env:
+        CIRRUS_ARCH: amd64
+      compute_engine_instance:
+        image_project: cirrus-images
+        image: family/docker-builder
+        platform: linux
+        cpu: 8
+        memory: 8G
+
+    - name: linux-arm64
+      env:
+        CIRRUS_ARCH: arm64
+      compute_engine_instance:
+        image_project: cirrus-images
+        image: family/docker-builder-arm64
+        architecture: arm64
+        platform: linux
+        cpu: 4
+        memory: 4G
+
+  build_script: TAG=$CIRRUS_ARCH make docker-build
+  login_script: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+  push_script: docker push joseluisq/hello-native:$CIRRUS_ARCH
+
+release_docker_builder:
+  only_if: $CIRRUS_TAG != ''
+  depends_on:
+    - build-linux-image
+  env:
+    DOCKER_USERNAME: ENCRYPTED[05b15d72b49f71a1f7b5c3dd7fa91f640fe95b75265b822ea1a4fb520a2cc63b5c81c90ef68e347feef6c5ffd7c29e39]
+    DOCKER_PASSWORD: ENCRYPTED[173ed8d2377a22ff1315c37d6d2085638b3edbe2ddf1dc7a9de851b0f2d0a563c64bc27550a53ba2d45d458e4d565cba]
+  login_script: docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+  manifests_script: |
+    docker manifest create \
+      joseluisq/hello-native:latest \
+        --amend joseluisq/hello-native:amd64 \
+        --amend joseluisq/hello-native:arm64
+  push_manifest_script: docker manifest push joseluisq/hello-native:latest
